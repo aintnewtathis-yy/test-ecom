@@ -3,6 +3,7 @@ WORKDIR /usr/src/app
 
 ARG TZ=Europe/Moscow
 ARG PUBLIC_HELLO
+ARG CMS_URL
 
 COPY . /usr/src/app
 RUN apk --no-cache add curl tzdata
@@ -28,5 +29,6 @@ RUN npm ci --only=production
 
 COPY --from=sk-build /usr/src/app/build /usr/src/app/build
 
+ENV CMS_URL=$CMS_URL
 EXPOSE 3000
 CMD ["node", "build/index.js"]

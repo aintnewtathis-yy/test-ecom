@@ -1,4 +1,4 @@
-name: build + publish
+name: Build + Publish
 
 on:
   push:
@@ -15,6 +15,17 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
         
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+        
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        
       - name: Publish Docker Image
         uses: matootie/github-docker@v3.1.0
         with:
@@ -22,11 +33,12 @@ jobs:
           containerRegistry: true
           buildArgs: |
             PUBLIC_HELLO=world
+            CMS_URL=${{ secrets.CMS_URL }}
             
       - name: Debug Dockerfile
         run: |
           cat Dockerfile
-            
+          
       - name: Deploy on CapRover
         uses: caprover/deploy-from-github@v1.1.2
         with:
@@ -34,5 +46,3 @@ jobs:
           app: 'test-ecom'
           token: ${{ secrets.APP_TOKEN }}
           image: 'ghcr.io/aintnewtathis-yy/test-ecom:latest'
-
-          
