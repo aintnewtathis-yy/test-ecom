@@ -14,6 +14,8 @@ RUN npm install
 
 RUN npm run build
 
+ENV CMS_URL=${CMS_URL:https://strapi-core.yunghurn.ru}
+
 FROM node:18-alpine
 WORKDIR /usr/src/app
 
