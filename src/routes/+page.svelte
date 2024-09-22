@@ -1,7 +1,6 @@
 <script>
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { getCartState } from '$lib/cart.svelte';
-	import { CMS_URL } from '$lib/globals';
 
 	let { data } = $props();
 
@@ -15,7 +14,7 @@
 		<div class="flex flex-col gap-3" >
 			<img
 				class="aspect-square w-full rounded object-cover object-top"
-				src={CMS_URL + product?.thumbnail?.url}
+				src={data.CMS_URL + product?.thumbnail?.url}
 				alt={product?.thumbnail?.alternativeText}
 			/>
 
