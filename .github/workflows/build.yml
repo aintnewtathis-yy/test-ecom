@@ -8,6 +8,8 @@ on:
 
 jobs:
   build:
+    env: 
+      CMS_URL: ${{ secrets.CMS_URL }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
