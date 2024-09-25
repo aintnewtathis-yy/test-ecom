@@ -10,6 +10,7 @@ jobs:
   build:
     env: 
       CMS_URL: ${{ secrets.CMS_URL }}
+      API_YOOKASSA_URL: ${{ secrets.API_YOOKASSA_URL }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
