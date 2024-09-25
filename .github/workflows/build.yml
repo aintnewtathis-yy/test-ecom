@@ -35,6 +35,7 @@ jobs:
           buildArgs: |
             PUBLIC_HELLO=world
             CMS_URL=${{ secrets.CMS_URL }}
+            API_YOOKASSA_URL=${{ secrets.API_YOOKASSA_URL }}
             
       - name: Debug Dockerfile
         run: |
