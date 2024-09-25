@@ -15,11 +15,9 @@ export class CartState {
         })
     }
 
-    add(title, quantity, price, thumbnail){
-        const id = crypto.randomUUID()
-
+    add( documentId, title, quantity, price, thumbnail){
         this.cartProducts.push({
-            id,
+            documentId,
             title,
             quantity,
             price,
@@ -27,7 +25,7 @@ export class CartState {
         })
     }
 
-    remove(id) {
+    remove(documentId) {
         
     }
 }
