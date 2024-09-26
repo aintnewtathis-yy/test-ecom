@@ -1,4 +1,5 @@
 import { CMS_URL } from '$env/static/private';
+import { error } from '@sveltejs/kit';
 
 export async function load({ fetch }) {
 	try {
@@ -8,8 +9,10 @@ export async function load({ fetch }) {
 		return {
             products: productsData
         };
-	} catch (error) {
-		console.log(error);
-		throw error(404, 'error');
+	} catch (err) {
+		console.log(err);
+		error(404, {
+			message: err
+		});
 	}
 }
