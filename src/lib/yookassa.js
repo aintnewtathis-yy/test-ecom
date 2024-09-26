@@ -1,4 +1,6 @@
 import { API_YOOKASSA_URL } from '$env/static/private';
+import { CMS_URL } from '$env/static/private';
+import { error } from '@sveltejs/kit';
 const authorization = `Basic ${API_YOOKASSA_URL}`;
 const initial_payment_msg = 'Списываем оплату за заказ';
 const my_url = '/success';
@@ -13,7 +15,7 @@ export const initialPayment = async (productsData) => {
 
 		// параметры для запроса
 		const headers = {
-			'Authorization': authorization,
+			Authorization: authorization,
 			'Idempotence-Key': crypto.randomUUID(),
 			'Content-Type': 'application/json'
 		};
@@ -53,12 +55,64 @@ export const initialPayment = async (productsData) => {
 			url: res.confirmation.confirmation_url,
 			id: res.id
 		};
-
 	} catch (err) {
 		console.warn('ERROR', err);
 
 		// Throw a custom error
 		throw new Error(400, 'error');
+	}
+};
+
+export const confirmPayment = async (order_id) => {
+	try {
+		// Step 1: Update order status in the CMS to "paid"
+		const responseOrder = await fetch(`${CMS_URL}/api/orders?filters[order_id][$eq]=${order_id}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				data: {
+					order_status: 'paid'
+				}
+			})
+		});
+
+		if (!responseOrder.ok) {
+			throw new Error('Failed to update order status in CMS');
+		}
+
+		const responseOrderData = await responseOrder.json();
+		console.log('Order status updated:', responseOrderData);
+
+		// Step 2: Confirm the payment in YooKassa (Capture the payment)
+		const responsePayment = await fetch(`https://api.yookassa.ru/v3/payments/${order_id}/capture`, {
+			method: 'POST', 
+			headers: {
+				Authorization: authorization,
+				'Idempotence-Key': crypto.randomUUID(),
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({})
+		});
+
+		if (!responsePayment.ok) {
+			throw new Error('Failed to confirm payment in YooKassa');
+		}
+
+		const responsePaymentData = await responsePayment.json();
+		console.log('Payment confirmed:', responsePaymentData);
+
+		return {
+			message: 'Payment confirmed and order status updated',
+			order: responseOrderData,
+			payment: responsePaymentData
+		};
+
+	} catch (err) {
+		console.warn(`Error confirming payment: ${err.message}`);
+		throw error(400, {
+			message: 'Error in confirming payment',
+			details: err.message
+		});
 	}
 };
 
