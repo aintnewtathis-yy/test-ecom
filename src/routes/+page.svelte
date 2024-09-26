@@ -5,8 +5,6 @@
 
 	let { data } = $props();
 
-	console.log(data);
-
 	const cartProducts = getCartState();
 </script>
 

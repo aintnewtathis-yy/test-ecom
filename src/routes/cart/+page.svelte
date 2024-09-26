@@ -4,6 +4,7 @@
     import * as Table from '$lib/components/ui/table/index.js';
 
     let { data } = $props();
+
     const products = getCartState();
 </script>
 

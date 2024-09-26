@@ -5,6 +5,8 @@ import { json, redirect } from '@sveltejs/kit';
 export const actions = {
     buy: async ({ request }) => {
         const formData = await request.formData();
+
+        console.log(formData, 'formData')
         const productsArray = JSON.parse(formData.get('productsArray'));
 
         const response = await fetch('http://localhost:1337/api/orders', {
@@ -17,6 +19,8 @@ export const actions = {
             })
         });
         const responseData = await response.json();
+
+        console.log(responseData, 'responseData')
         
         const { url, id } = await initialPayment(productsArray);
 
