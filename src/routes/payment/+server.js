@@ -24,3 +24,4 @@ export async function POST({ request }) {
 
     return json({ message: 'Webhook received' }, { status: 200 });
 }
+

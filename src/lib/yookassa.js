@@ -64,10 +64,11 @@ export const initialPayment = async (productsData) => {
 };
 
 export const confirmPayment = async (order_id) => {
+    console.log(order_id)
 	try {
 		// Step 1: Update order status in the CMS to "paid"
 		const responseOrder = await fetch(`${CMS_URL}/api/orders?filters[order_id][$eq]=${order_id}`, {
-			method: 'PUT',
+			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				data: {
