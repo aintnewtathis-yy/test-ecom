@@ -64,16 +64,15 @@ export const initialPayment = async (productsData) => {
 };
 
 export const confirmPayment = async (order_id) => {
-    console.log(order_id)
+	console.log(order_id);
 	try {
 		// Step 1: Update order status in the CMS to "paid"
-		const responseOrder = await fetch(`${CMS_URL}/api/orders?filters[order_id][$eq]=${order_id}`, {
+		const responseOrder = await fetch(`${CMS_URL}/api/orders/updateOrderStatus`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				data: {
-					order_status: 'paid'
-				}
+				order_id: order_id,
+				order_status: 'paid'
 			})
 		});
 
@@ -86,7 +85,7 @@ export const confirmPayment = async (order_id) => {
 
 		// Step 2: Confirm the payment in YooKassa (Capture the payment)
 		const responsePayment = await fetch(`https://api.yookassa.ru/v3/payments/${order_id}/capture`, {
-			method: 'POST', 
+			method: 'POST',
 			headers: {
 				Authorization: authorization,
 				'Idempotence-Key': crypto.randomUUID(),
@@ -107,7 +106,58 @@ export const confirmPayment = async (order_id) => {
 			order: responseOrderData,
 			payment: responsePaymentData
 		};
+	} catch (err) {
+		console.warn(`Error confirming payment: ${err.message}`);
+		throw error(400, {
+			message: 'Error in confirming payment',
+			details: err.message
+		});
+	}
+};
 
+export const cancelPayment = async (order_id) => {
+	console.log(order_id);
+	try {
+		// Step 1: Update order status in the CMS to "paid"
+		const responseOrder = await fetch(`${CMS_URL}/api/orders/updateOrderStatus`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				order_id: order_id,
+				order_status: 'cancelled'
+			})
+		});
+
+		if (!responseOrder.ok) {
+			throw new Error('Failed to update order status in CMS');
+		}
+
+		const responseOrderData = await responseOrder.json();
+		console.log('Order status updated:', responseOrderData);
+
+		// Step 2: Confirm the payment in YooKassa (Capture the payment)
+		const responsePayment = await fetch(`https://api.yookassa.ru/v3/payments/${order_id}/cancel`, {
+			method: 'POST',
+			headers: {
+				Authorization: authorization,
+				'Idempotence-Key': crypto.randomUUID(),
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({})
+		});
+
+		if (!responsePayment.ok) {
+			throw new Error('Failed to confirm payment in YooKassa');
+		}
+
+		const responsePaymentData = await responsePayment.json();
+		console.log('Payment cancelled:', responsePaymentData);
+
+		return {
+			message: 'Payment cancelled',
+			order: responseOrderData,
+			payment: responsePaymentData
+		};
 	} catch (err) {
 		console.warn(`Error confirming payment: ${err.message}`);
 		throw error(400, {
