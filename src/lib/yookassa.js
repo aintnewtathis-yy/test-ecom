@@ -71,8 +71,10 @@ export const confirmPayment = async (order_id) => {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				order_id: order_id,
-				order_status: 'paid'
+				data: {
+					order_id: order_id,
+					order_status: 'paid'
+				}
 			})
 		});
 

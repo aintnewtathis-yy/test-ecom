@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { confirmPayment } from '$lib/yookassa.js'; 
+import { confirmPayment, declinePayment } from '$lib/yookassa.js'; 
 
 export async function POST({ request }) {
     const body = await request.json();
